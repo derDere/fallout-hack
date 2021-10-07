@@ -1,5 +1,5 @@
 import curses
-import screen
+from screen import Screen
 from words import Words
 
 
@@ -18,12 +18,17 @@ def printColors(stdscr):
     stdscr.getch()
 
 
+def startScreen(stdscr):
+  screen = Screen(stdscr)
+  words = Words('words.txt', screen)
+  screen.game(words)
+
+
 def main(argv):
   if 'pc' in argv:
     curses.wrapper(printColors)
   else:
-    words = Words('words.txt')
-    curses.wrapper(screen.screen, words)
+    curses.wrapper(startScreen)
 
 
 if __name__=="__main__":

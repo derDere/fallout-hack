@@ -1,6 +1,8 @@
 import os
 import json
 import random
+import curses
+import screen as s
 
 
 def likeliness(a, b):
@@ -14,7 +16,16 @@ def likeliness(a, b):
 
 
 class Words:
-  def __init__(self, path):
+  def __init__(self, path, screen):
+    self.winWidth = 46
+    self.winHeight = 6
+    h, w, x, y = screen.center(self.winHeight, self.winWidth)
+    self.loadWin = curses.newwin(h, w, x, y)
+    self.loadWin.attron(curses.color_pair(1))
+    self.loadWin.border()
+    self.loadWin.refresh()
+    self.path = path
+    self.screen = screen
     self.list = []
     self.byLen = {
       3: [],
@@ -32,13 +43,30 @@ class Words:
           self.byLen[l].append(index)
     self.relations = {}
     if os.path.isfile('relations.json'):
-      print("Loading word relations ...")
+      self.loadWin.addstr(2, 2, "Hacking into system ...")
+      s.progressBar(self.loadWin, self.winHeight - 2, 2, 0, 100, self.winWidth - 4, "0%")
+      self.loadWin.refresh()
+      global count
+      count = 0
+      def hook(obj):
+        #value = obj.get("features")
+        #if value:
+        global count
+        count += 1
+        s.progressBar(self.loadWin, self.winHeight - 2, 2, count, len(self.list), self.winWidth - 4, "%i%%" % (round(count / len(self.list) * 100)) )
+        self.loadWin.refresh()
+        return obj
       with open('relations.json', 'r') as f:
-        self.relations = json.load(f)
+        self.relations = json.load(f, object_hook=hook)
     else:
-      print("Generating word relations\nDon't worry this only has to be done once.")
+      self.loadWin.addstr(1, 2, "Generating word relation database.")
+      self.loadWin.addstr(2, 2, "Don't worry this only has to be done once.")
+      s.progressBar(self.loadWin, self.winHeight - 2, 2, 0, 100, self.winWidth - 4, "0%")
+      self.loadWin.refresh()
       for i in range(len(self.list)):
-        print("%i / %i - %i%%" % (i, len(self.list), round(100 * i / len(self.list))), end="\r")
+        #screen.stdscr.addstr("%i / %i - %i%%" % (i, len(self.list), round(100 * i / len(self.list))), end="\r")
+        s.progressBar(self.loadWin, self.winHeight - 2, 2, i, len(self.list), self.winWidth - 4, "%i%%" % (round(i / len(self.list) * 100)) )
+        self.loadWin.refresh()
         word = self.list[i]
         data = {}
         for n in range(1, len(word)):
@@ -50,7 +78,7 @@ class Words:
             if likns > 0:
               data[str(likns)].append(j)
         self.relations[str(i)] = data
-      print("\n")
+      #print("\n")
       with open('relations.json', 'w') as f:
         jj = json.dumps(self.relations)
         f.write(jj)
