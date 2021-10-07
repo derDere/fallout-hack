@@ -10,11 +10,11 @@ def printColors(stdscr):
         curses.init_pair(i + 1, i, -1)
     try:
         for i in range(0, 255):
-            stdscr.addstr("(%i,%i,%i)" % (i + 1, i, -1), curses.color_pair(i))
+            stdscr.addstr("%i\t" % (i - 1), curses.color_pair(i))
     except curses.ERR:
         # End of screen reached
         pass
-    stdscr.addstr('#' * 200, curses.color_pair(11))
+    #stdscr.addstr('#' * 200, curses.color_pair(11))
     stdscr.getch()
 
 

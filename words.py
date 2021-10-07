@@ -49,8 +49,6 @@ class Words:
       global count
       count = 0
       def hook(obj):
-        #value = obj.get("features")
-        #if value:
         global count
         count += 1
         s.progressBar(self.loadWin, self.winHeight - 2, 2, count, len(self.list), self.winWidth - 4, "%i%%" % (round(count / len(self.list) * 100)) )
@@ -64,7 +62,6 @@ class Words:
       s.progressBar(self.loadWin, self.winHeight - 2, 2, 0, 100, self.winWidth - 4, "0%")
       self.loadWin.refresh()
       for i in range(len(self.list)):
-        #screen.stdscr.addstr("%i / %i - %i%%" % (i, len(self.list), round(100 * i / len(self.list))), end="\r")
         s.progressBar(self.loadWin, self.winHeight - 2, 2, i, len(self.list), self.winWidth - 4, "%i%%" % (round(i / len(self.list) * 100)) )
         self.loadWin.refresh()
         word = self.list[i]
@@ -78,7 +75,6 @@ class Words:
             if likns > 0:
               data[str(likns)].append(j)
         self.relations[str(i)] = data
-      #print("\n")
       with open('relations.json', 'w') as f:
         jj = json.dumps(self.relations)
         f.write(jj)
